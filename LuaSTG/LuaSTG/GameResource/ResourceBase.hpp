@@ -18,7 +18,7 @@ namespace luastg {
 
 	// 混合模式
 	enum class BlendMode : uint8_t {
-		__RESERVE__ = 0,
+		Unknown = 0,
 
 		MulAlpha = 1,		//顶点色和纹理色相乘 混合模式：正常（透明度混合）
 		MulAdd = 2,			//顶点色和纹理色相乘 混合模式：线性减淡（加法）
@@ -41,8 +41,6 @@ namespace luastg {
 		AddScreen = 17,		//顶点色和纹理色相加 混合模式：滤色（相加减去相乘）
 
 		One = 18,			//无混合，直接覆盖
-
-		_KEY_NOT_FOUND = 0x7f,
 	};
 	static_assert(sizeof(BlendMode) == sizeof(uint8_t));
 

@@ -80,7 +80,7 @@ namespace luastg
 			return BlendMode::MulAlpha;
 		}
 		BlendMode mode = static_cast<BlendMode>(LuaSTG::MapBlendModeX(key, len));
-		if (mode == BlendMode::_KEY_NOT_FOUND) {
+		if (mode == BlendMode::Unknown) {
 			luaL_error(L, "invalid blend mode '%s'.", key);
 			return BlendMode::MulAlpha;
 		}
