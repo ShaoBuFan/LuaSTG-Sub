@@ -13,14 +13,14 @@ private:
     };
 private:
     #define MYCALLBACK(_T) STEAM_CALLBACK(SteamCallbackWrapper, On##_T, _T##_t)
-    //MYCALLBACK(GlobalAchievementPercentagesReady);
+    MYCALLBACK(GlobalAchievementPercentagesReady);
     //MYCALLBACK(GlobalStatsReceived);
     //MYCALLBACK(LeaderboardFindResult);
     //MYCALLBACK(LeaderboardScoresDownloaded);
     //MYCALLBACK(LeaderboardScoreUploaded);
     //MYCALLBACK(LeaderboardUGCSet);
     MYCALLBACK(NumberOfCurrentPlayers);
-    //MYCALLBACK(UserAchievementIconFetched);
+    MYCALLBACK(UserAchievementIconFetched);
     MYCALLBACK(UserAchievementStored);
     MYCALLBACK(UserStatsReceived);
     MYCALLBACK(UserStatsStored);
@@ -72,6 +72,8 @@ public:
             {"OnUserStatsReceived", &xSteamCallback::empty},
             {"OnUserStatsStored", &xSteamCallback::empty},
             {"OnUserStatsUnloaded", &xSteamCallback::empty},
+            {"OnGlobalAchievementPercentagesReady", &xSteamCallback::empty},
+            {"OnUserAchievementIconFetched", &xSteamCallback::empty},
             {NULL, NULL},
         };
         luaL_register(L, NULL, lib);  // ... t
@@ -192,6 +194,42 @@ MYFUNCTION(UserStatsUnloaded)
             lua_createtable(L, 0, 1);                                       // ... t f arg
             lua_push_uint64(L, pParam->m_steamIDUser.ConvertToUint64());    // ... t f arg i
             lua_setfield(L, -2, "m_steamIDUser");                           // ... t f arg
+            lua_call(L, 1, 0);                                              // ... t
+        }
+    }
+};
+MYFUNCTION(GlobalAchievementPercentagesReady)
+{
+    if (L)
+    {
+        lua_getfield(L, -1, "OnGlobalAchievementPercentagesReady");         // ... t f
+        if (lua_isfunction(L, -1) || lua_iscfunction(L, -1))
+        {
+            lua_createtable(L, 0, 2);                                       // ... t f arg
+            lua_push_uint64(L, pParam->m_nGameID);                          // ... t f arg i
+            lua_setfield(L, -2, "m_nGameID");                               // ... t f arg
+            lua_pushinteger(L, (lua_Integer)pParam->m_eResult);             // ... t f arg i
+            lua_setfield(L, -2, "m_eResult");                               // ... t f arg
+            lua_call(L, 1, 0);                                              // ... t
+        }
+    }
+};
+MYFUNCTION(UserAchievementIconFetched)
+{
+    if (L)
+    {
+        lua_getfield(L, -1, "OnUserAchievementIconFetched");                // ... t f
+        if (lua_isfunction(L, -1) || lua_iscfunction(L, -1))
+        {
+            lua_createtable(L, 0, 4);                                       // ... t f arg
+            lua_push_uint64(L, pParam->m_nGameID.ToUint64());               // ... t f arg i
+            lua_setfield(L, -2, "m_nGameID");                               // ... t f arg
+            lua_pushstring(L, pParam->m_rgchAchievementName);               // ... t f arg s
+            lua_setfield(L, -2, "m_rgchAchievementName");                   // ... t f arg
+            lua_pushboolean(L, pParam->m_bAchieved);                        // ... t f arg b
+            lua_setfield(L, -2, "m_bAchieved");                             // ... t f arg
+            lua_pushinteger(L, pParam->m_nIconHandle);                      // ... t f arg i
+            lua_setfield(L, -2, "m_nIconHandle");                           // ... t f arg
             lua_call(L, 1, 0);                                              // ... t
         }
     }

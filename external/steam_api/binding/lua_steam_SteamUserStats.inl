@@ -60,9 +60,12 @@ struct xSteamUserStats
         lua_pushstring(L, ret);
         return 1;
     };
-    static int GetAchievementIcon                 (lua_State* L) // !
+    static int GetAchievementIcon                 (lua_State* L)
     {
-        return 0;
+        const char* pchName = luaL_checkstring(L, 1);
+        const int ret = SteamUserStats()->GetAchievementIcon(pchName);
+        lua_pushinteger(L, ret); // image handle for SteamUtils()->GetImageRGBA(), 0 if not ready / no image
+        return 1;
     };
     static int GetAchievementName                 (lua_State* L)
     {
@@ -71,13 +74,30 @@ struct xSteamUserStats
         lua_pushstring(L, ret);
         return 1;
     };
-    static int GetMostAchievedAchievementInfo     (lua_State* L) // !
+    static int GetMostAchievedAchievementInfo     (lua_State* L)
     {
-        return 0;
+        char pchName[k_cchStatNameMax] = {};
+        float flPercent = 0.0f;
+        bool bAchieved = false;
+        const int ret = SteamUserStats()->GetMostAchievedAchievementInfo(pchName, k_cchStatNameMax, &flPercent, &bAchieved);
+        lua_pushinteger(L, ret);    // iterator, -1 if no data (RequestGlobalAchievementPercentages not done)
+        lua_pushstring(L, pchName); // empty string when ret < 0
+        lua_pushnumber(L, flPercent);
+        lua_pushboolean(L, bAchieved);
+        return 4;
     };
-    static int GetNextMostAchievedAchievementInfo (lua_State* L) // !
+    static int GetNextMostAchievedAchievementInfo (lua_State* L)
     {
-        return 0;
+        const int iIteratorPrevious = (int)luaL_checkinteger(L, 1);
+        char pchName[k_cchStatNameMax] = {};
+        float flPercent = 0.0f;
+        bool bAchieved = false;
+        const int ret = SteamUserStats()->GetNextMostAchievedAchievementInfo(iIteratorPrevious, pchName, k_cchStatNameMax, &flPercent, &bAchieved);
+        lua_pushinteger(L, ret);    // next iterator, -1 after the last achievement
+        lua_pushstring(L, pchName);
+        lua_pushnumber(L, flPercent);
+        lua_pushboolean(L, bAchieved);
+        return 4;
     };
     static int GetNumAchievements                 (lua_State* L)
     {
@@ -102,9 +122,11 @@ struct xSteamUserStats
         lua_pushboolean(L, ret);
         return 1;
     };
-    static int RequestGlobalAchievementPercentages(lua_State* L) // !
+    static int RequestGlobalAchievementPercentages(lua_State* L)
     {
-        return 0;
+        const SteamAPICall_t ret = SteamUserStats()->RequestGlobalAchievementPercentages();
+        lua_push_SteamAPICall_t(L, ret); // result delivered via GlobalAchievementPercentagesReady_t callback
+        return 1;
     };
     static int SetAchievement                     (lua_State* L)
     {
