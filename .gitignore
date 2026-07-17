@@ -21,3 +21,6 @@ DirectX/DirectXSDK/backup/*
 
 # AI
 /.claude/
+
+# downloads (Steamworks SDK installer, must not be redistributed per Steam terms)
+steamworks_sdk_*.zip
